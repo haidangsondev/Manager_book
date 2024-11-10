@@ -11,21 +11,17 @@ import {
 } from "../controllers/auth.controllers.js";
 import { verifyAccessToken } from "../utils/jwt.js";
 
-const authRouter = express.Router();
+const router = express.Router();
 
-authRouter.post("/register", validateRequest("register"), register);
-authRouter.get("/final-register/:register_token", finalRegister);
-authRouter.post("/login", validateRequest("login"), loginUser);
-authRouter.post("/logout", verifyAccessToken, logoutUser);
-authRouter.post(
+router.post("/register", validateRequest("register"), register);
+router.get("/final-register/:register_token", finalRegister);
+router.post("/login", validateRequest("login"), loginUser);
+router.post("/logout", verifyAccessToken, logoutUser);
+router.post(
   "/forgot-password",
   validateRequest("forgot-password"),
   forgotPassword
 );
-authRouter.put(
-  "/reset-password",
-  validateRequest("reset-password"),
-  resetPassword
-);
-authRouter.post("/refresh-token", verifyAccessToken, refreshAccessToken);
-export default authRouter;
+router.put("/reset-password", validateRequest("reset-password"), resetPassword);
+router.post("/refresh-token", verifyAccessToken, refreshAccessToken);
+export default router;

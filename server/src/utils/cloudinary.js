@@ -14,7 +14,7 @@ const storage = new CloudinaryStorage({
   cloudinary,
   allowedFormats: ["jpg", "png", "mp4", "mov", "avi", "mkv"],
   params: {
-    folder: "Twitter app",
+    folder: "Manager book",
     resource_type: "auto",
   },
 });

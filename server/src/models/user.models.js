@@ -7,7 +7,7 @@ const userSchema = new mongoose.Schema(
       type: String,
       required: true,
       minlength: 5,
-      maxlength: 15,
+      maxlength: 30,
       trim: true,
     },
     email: {
@@ -20,6 +20,15 @@ const userSchema = new mongoose.Schema(
       required: true,
       minlength: 8,
     },
+    address: {
+      type: String,
+      maxlength: 256,
+    },
+    membership_status: {
+      type: String,
+      enum: ["hoạt động", "hết hạn", "bị cấm"],
+      default: "hoạt động",
+    },
     phone: {
       type: String,
       minlength: 10,
@@ -28,20 +37,24 @@ const userSchema = new mongoose.Schema(
       {
         bookId: {
           type: mongoose.Schema.Types.ObjectId,
-          ref: "BorrowRecord",
-        }, // Tham chiếu đến sách đang mượn
-        borrowedDate: Date, // Ngày mượn sách
-        dueDate: Date, // Ngày trả sách
-        returnedDate: Date, // Ngày trả sách (nếu đã trả)
+          ref: "Book",
+        },
       },
     ],
     reservedBooks: [
       {
-        bookId: {
+        reversationId: {
           type: mongoose.Schema.Types.ObjectId,
           ref: "Reservation",
         },
-        reservedDate: Date, // Ngày đặt trước
+      },
+    ],
+    history: [
+      {
+        transactionId: {
+          type: mongoose.Schema.Types.ObjectId,
+          ref: "Transactions",
+        },
       },
     ],
     emailToken: {
@@ -76,7 +89,7 @@ const userSchema = new mongoose.Schema(
     role: {
       type: String,
       enum: ["admin", "user"],
-      default: "user", // Mặc định người dùng thường
+      default: "user",
     },
   },
   { timestamps: true }

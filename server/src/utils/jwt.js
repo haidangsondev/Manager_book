@@ -33,7 +33,6 @@ export const verifyAccessToken = asyncHandler(async (req, res, next) => {
 
 export const verifyIsAdmin = asyncHandler(async (req, res, next) => {
   const { role } = req.user;
-  // console.log(role);
   if (role !== "admin") {
     return res.status(401).json({
       success: false,

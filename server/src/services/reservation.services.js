@@ -1,28 +1,23 @@
 import reservationModel from "../models/reservation.models.js";
 
-export const createReservationService = async (userId, bookId) => {
-  const response = await reservationModel.create({
-    userId,
-    bookId,
+export const createReservation = async (_id, bookId, expiryDate) => {
+  return await reservationModel.create({
+    user_id: _id,
+    book_id: bookId,
+    expiry_date: expiryDate,
   });
-  return response;
 };
 
-export const getUserReservationsService = async (userId) => {
-  const response = await reservationModel.find({ userId }).populate("bookId");
-  return response;
+export const getUserReservations = async (_id) => {
+  return await reservationModel
+    .find({ user_id: _id })
+    .populate("book_id", "title author");
 };
 
-export const cancelReservationService = async (reservationId, userId) => {
-  const response = await reservationModel.findOne({
-    _id: reservationId,
-    userId,
-  });
-
-  return response;
-};
-
-export const fulfillReservationService = async (reservationId) => {
-  const response = await reservationModel.findById(reservationId);
-  return response;
+export const cancelReservation = async (reservation_id) => {
+  return await reservationModel.findByIdAndUpdate(
+    reservation_id,
+    { status: "hủy" },
+    { new: true }
+  );
 };

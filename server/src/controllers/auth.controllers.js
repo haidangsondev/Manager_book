@@ -15,10 +15,12 @@ import jwt from "jsonwebtoken";
 
 export const register = asyncHandler(async (req, res, next) => {
   const { email } = req.body;
-
   const Email = await checkEmail(email);
   if (Email) {
-    throw new Error("Email đã tồn tại");
+    return res.status(500).json({
+      success: false,
+      message: "Email đã tồn tại",
+    });
   }
 
   const registerToken = uniqid();
@@ -95,7 +97,7 @@ export const loginUser = asyncHandler(async (req, res) => {
   } = User.toObject();
   const accessToken = signAccessToken(User._id, role);
   const refreshToken = signRefreshToken(User._id);
-  console.log(role);
+
   await updateUserLogin({ user_id: User._id, refreshToken });
   res.cookie("refresh_book_token", refreshToken, {
     httpOnly: true,

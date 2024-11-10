@@ -1,26 +1,21 @@
 import express from "express";
-import { verifyAccessToken, verifyIsAdmin } from "../utils/jwt.js";
+import { verifyAccessToken } from "../utils/jwt.js";
 import {
-  cancelReservation,
-  createReservation,
-  fulfillReservation,
-  getUserReservations,
-} from "../controllers/reservation.controllers.js";
+  reserveBook,
+  getReservations,
+  cancelBookReservation,
+} from "../controllers/reversation.controllers.js";
 
-const reservationRouter = express.Router();
+const router = express.Router();
 
-reservationRouter.post("/", verifyAccessToken, createReservation);
-reservationRouter.get("/", verifyAccessToken, getUserReservations);
-reservationRouter.put(
-  "/cancel/:reservationId",
+router.post("/", verifyAccessToken, reserveBook);
+
+router.get("/", verifyAccessToken, getReservations);
+
+router.patch(
+  "/cancel/:reservation_id",
   verifyAccessToken,
-  cancelReservation
-);
-reservationRouter.put(
-  "/fulfill/:reservationId",
-  verifyAccessToken,
-  verifyIsAdmin,
-  fulfillReservation
+  cancelBookReservation
 );
 
-export default reservationRouter;
+export default router;

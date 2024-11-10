@@ -57,24 +57,6 @@ export const getCategories = asyncHandler(async (req, res) => {
   });
 });
 
-export const searchCategories = asyncHandler(async (req, res) => {
-  const { keyword } = req.query;
-  const categories = await searchCategoriesBook(keyword);
-
-  if (!categories) {
-    return res.status(404).json({
-      success: true,
-      message: "Không tìm thấy thể loại sách nào",
-    });
-  }
-
-  res.status(200).json({
-    success: true,
-    message: "Thể loại sách theo từ khóa",
-    categories,
-  });
-});
-
 export const deleteCategory = asyncHandler(async (req, res) => {
   const { id } = req.params;
 

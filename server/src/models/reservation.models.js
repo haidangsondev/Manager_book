@@ -1,32 +1,31 @@
+// models/reservation.model.js
 import mongoose from "mongoose";
 
-const reservationSchema = new mongoose.Schema(
-  {
-    userId: {
-      type: mongoose.Schema.Types.ObjectId,
-      ref: "User",
-      required: true,
-    },
-    bookId: {
-      type: mongoose.Schema.Types.ObjectId,
-      ref: "Book",
-      required: true,
-    },
-    reservedDate: {
-      type: Date,
-      default: Date.now,
-      required: true,
-    },
-    status: {
-      type: String,
-      enum: ["Chờ đợi", "Hủy", "Xác nhận", "Không còn"],
-      default: "Chờ đợi",
-      required: true,
-    },
+const reservationSchema = new mongoose.Schema({
+  user_id: {
+    type: mongoose.Schema.Types.ObjectId,
+    ref: "User",
+    required: true,
   },
-  { timestamps: true }
-);
+  book_id: {
+    type: mongoose.Schema.Types.ObjectId,
+    ref: "Book",
+    required: true,
+  },
+  reservation_date: {
+    type: Date,
+    default: Date.now,
+  },
+  status: {
+    type: String,
+    enum: ["chờ đợi", "hoàn thành", "hủy"],
+    default: "chờ đợi",
+  },
+  expiry_date: {
+    type: Date,
+    required: true,
+  },
+});
 
 const Reservation = mongoose.model("Reservation", reservationSchema);
-
 export default Reservation;

@@ -6,9 +6,9 @@ const registerFields = {
     .messages({
       "string.min": "Tên người dùng phải có ít nhất 5 ký tự.",
     })
-    .max(15)
+    .max(30)
     .messages({
-      "string.max": "Tên người dùng không được vượt quá 15 ký tự.",
+      "string.max": "Tên người dùng không được vượt quá 30 ký tự.",
     })
     .required()
     .messages({
