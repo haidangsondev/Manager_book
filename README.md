@@ -49,7 +49,7 @@ Dự án sử dụng mô hình MVC (Model-View-Controller), bao gồm:
 
 1. Clone repository:
    ```bash
-   git clone [link repository]
+   git clone https://github.com/haidangsondev/Manager_book
    ```
 2. Cài đặt các gói cần thiết:
    ```bash
