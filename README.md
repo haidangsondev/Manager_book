@@ -27,7 +27,7 @@ Dự án sử dụng mô hình Model-Controller-Services, bao gồm:
 - **Routes**: Định tuyến các API cho các chức năng quản lý thư viện.
 - **Middlewares**: Xử lí các logic về lỗi trước khi gửi lên server hoặc kết quả lỗi khi xử lí.
 
-   ![kiến trúc hệ thống](../manager_book/server/src/img/image.png)
+   ![kiến trúc hệ thống](./server/src/img/image.png)
 ## 4. Công Nghệ Sử Dụng
 
 - **Ngôn ngữ lập trình**: Node.js
