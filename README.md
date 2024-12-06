@@ -28,28 +28,8 @@ Dự án sử dụng mô hình Model-Controller-Services, bao gồm:
 - **Middlewares**: Xử lí các logic về lỗi trước khi gửi lên server hoặc kết quả lỗi khi xử lí.
 
    ![kiến trúc hệ thống](./server/src/img/image.png)
-## 4. Công Nghệ Sử Dụng
 
-- **Ngôn ngữ lập trình**: Node.js
-- **Framework**: Express.js
-- **Cơ sở dữ liệu**: MongoDB
-- **Thư viện hỗ trợ**:
-  - Mongoose (ORM cho MongoDB)
-  - JWT (JSON Web Token cho xác thực)
-  - bcrypt (Mã hóa mật khẩu)
-  - dotenv (Quản lý biến môi trường)
-  - Cloudinary (Lưu trữ đám mây cho hình ảnh)
-  - Multer (Middleware cho việc tải file)
-  - Cookie-Parser (Phân tích và quản lý cookies)
-  - CORS (Hỗ trợ yêu cầu giữa các nguồn gốc khác nhau)
-  - Crypto (Thư viện mã hóa)
-  - Express-Async-Handler (Quản lý lỗi bất đồng bộ)
-  - Joi (Xác thực dữ liệu)
-  - Nodemailer (Gửi email từ Node.js)
-  - Uniqid (Tạo ID duy nhất)
-  - Validator (Xác thực chuỗi, email, URL)
-
-## 5. Hướng Dẫn Cài Đặt
+## 4. Hướng Dẫn Cài Đặt
 
 ### Các bước để cài đặt và chạy dự án:
 
@@ -83,6 +63,6 @@ Dự án sử dụng mô hình Model-Controller-Services, bao gồm:
    http://localhost:7000
    ```
 
-## 6. Kết Luận
+## 5. Kết Luận
 
 Dự án quản lý thư viện giúp đơn giản hóa việc quản lý sách và độc giả, tối ưu hóa quá trình mượn trả sách. Trong tương lai, dự án có thể được mở rộng với tính năng quản lý báo cáo, thống kê và tích hợp giao diện người dùng.
