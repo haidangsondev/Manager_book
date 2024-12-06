@@ -1,4 +1,4 @@
-# Dự Án Quản Lý Thư Viện
+# Quản Lý Thư Viện
 
 ## 1. Mô Tả Dự Án
 
@@ -7,18 +7,18 @@ Dự án quản lý thư viện được xây dựng bằng Node.js và Express 
 ## 2. Tính Năng Chính
 
 - Quản lý thông tin sách (thêm, sửa, xóa, xem chi tiết)
-- Quản lý độc giả (đăng ký, cập nhật thông tin,quên mật khẩu,thay đổi mật khẩu, xác thực tài khoản qua email)
+- Quản lý độc giả 
 - Hỗ trợ thao tác mượn và trả sách
 - Theo dõi lịch sử mượn trả sách
 - Đăng nhập và phân quyền cho admin
 
 ## 3. Kiến Trúc Hệ Thống
 
-Dự án sử dụng mô hình MVC (Model-View-Controller), bao gồm:
+Dự án sử dụng mô hình Model-Controller-Services, bao gồm:
 
 - **Models**: Định nghĩa các schema của MongoDB cho sách, độc giả, và các giao dịch mượn trả sách.
-- **Controllers**: Xử lý logic cho các thao tác như thêm sách, mượn sách, trả sách,đăng ký, đăng nhập đọc giả,...kết hợp với Services xử lí logic ngắn ngọn, dễ hiểu, mạch lạc.
-- **Views**: Sử dụng JSON để trả về dữ liệu cho client (REST API).
+- **Controllers**: Xử lý logic cho các thao tác như thêm sách, mượn sách, trả sách,đăng ký, đăng nhập đọc giả,...
+- **Services**: Kết hợp với Controller xử lí logic ngắn ngọn, dễ hiểu, mạch lạc.
 - **Routes**: Định tuyến các API cho các chức năng quản lý thư viện.
 - **Middlewares**: Xử lí các logic về lỗi trước khi gửi lên server hoặc kết quả lỗi khi xử lí.
 
