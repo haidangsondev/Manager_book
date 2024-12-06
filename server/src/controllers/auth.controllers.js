@@ -8,7 +8,7 @@ import {
 import asyncHandler from "express-async-handler";
 import { sendEmail } from "../utils/sendEmail.js";
 import uniqid from "uniqid";
-import { checkPassword } from "../utils/password.js";
+import { checkPassword, hashPasswrod } from "../utils/password.js";
 import { signAccessToken, signRefreshToken } from "../utils/jwt.js";
 import crypto from "crypto";
 import jwt from "jsonwebtoken";
@@ -82,7 +82,7 @@ export const finalRegister = asyncHandler(async (req, res, next) => {
 
 export const loginUser = asyncHandler(async (req, res) => {
   const { email, password } = req.body;
-
+  await hashPasswrod(password);
   const User = await checkEmail({ email });
   if (!(User && (await checkPassword(password, User.password)))) {
     throw new Error("Email hoặc Password không hợp lệ");
@@ -172,7 +172,7 @@ export const resetPassword = asyncHandler(async (req, res) => {
     throw new Error("Người dùng không tồn tại");
   }
 
-  User.password = password;
+  User.password = await hashPasswrod(password);
   User.passwordResetToken = undefined;
   User.passwordResetExpires = undefined;
   User.passwordChangeAt = Date.now();

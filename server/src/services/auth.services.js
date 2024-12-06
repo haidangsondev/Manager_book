@@ -2,14 +2,10 @@ import userModel from "../models/user.models.js";
 import { hashPasswrod } from "../utils/password.js";
 
 export const checkEmail = async ({ email }) => {
-  const response = await userModel.findOne({ email });
-
-  return response;
+  return await userModel.findOne({ email });
 };
 export const checkPasswordToken = async ({ passwordResetToken }) => {
-  const response = await userModel.findOne({ passwordResetToken });
-
-  return response;
+  return await userModel.findOne({ passwordResetToken });
 };
 
 export const checkUserRefreshAccessToken = async ({

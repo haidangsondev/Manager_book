@@ -4,6 +4,9 @@ import {
   borrowBookUser,
   getborrowBookUser,
   getHistoryBorrowBooked,
+  getTransactions,
+  getTransactionById,
+  deleteTransactionById,
 } from "../services/transaction.services.js";
 import {
   addBorrowed,
@@ -14,6 +17,7 @@ import {
 export const borrowBook = asyncHandler(async (req, res) => {
   const { book_id } = req.body;
   const { _id } = req.user;
+
   const book = await getBook(book_id);
   if (!book || book.available_copies <= 0) {
     return res
@@ -22,13 +26,14 @@ export const borrowBook = asyncHandler(async (req, res) => {
   }
 
   const due_date = new Date();
-  due_date.setDate(due_date.getDate() + 14);
+  due_date.setDate(due_date.getDate() + 7);
 
-  const transaction = await borrowBookUser({
+  const data = {
     user_id: _id,
     book_id,
     due_date,
-  });
+  };
+  const transaction = await borrowBookUser(data);
 
   book.available_copies -= 1;
   await book.save();
@@ -39,7 +44,7 @@ export const borrowBook = asyncHandler(async (req, res) => {
   return res.status(201).json({
     success: true,
     message: "Mượn sách thành công.",
-    data: transaction,
+    transaction,
   });
 });
 
@@ -79,7 +84,7 @@ export const returnBook = asyncHandler(async (req, res) => {
   return res.status(200).json({
     success: true,
     message: "Trả sách thành công.",
-    data: transaction,
+    transaction,
   });
 });
 
@@ -106,13 +111,16 @@ export const extendBorrowing = asyncHandler(async (req, res) => {
     });
   }
 
-  transaction.due_date.setDate(transaction.due_date.getDate() + 7);
+  transaction.due_date = new Date(
+    transaction.due_date.setDate(transaction.due_date.getDate() + 7)
+  );
+  console.log(transaction.due_date.getDate());
   await transaction.save();
 
   return res.status(200).json({
     success: true,
     message: "Gia hạn mượn sách thành công.",
-    data: transaction,
+    transaction,
   });
 });
 
@@ -124,5 +132,38 @@ export const getBorrowHistory = asyncHandler(async (req, res) => {
     success: true,
     message: "Danh sách lịch sử mượn sách.",
     data: history,
+  });
+});
+
+export const getAllTransactions = asyncHandler(async (req, res) => {
+  const transactions = await getTransactions();
+  return res.status(transactions ? 200 : 404).json({
+    success: transactions ? true : false,
+    message: transactions ? "Danh sách giao dịch." : "Giao dịch không tồn tại.",
+    transactions,
+  });
+});
+
+export const getTransactionDetails = asyncHandler(async (req, res) => {
+  const { transactionId } = req.params;
+
+  const transaction = await getTransactionById(transactionId);
+
+  return res.status(transaction ? 200 : 404).json({
+    success: transaction ? true : false,
+    message: transaction ? "Chi tiết giao dịch." : "Giao dịch không tồn tại.",
+    transaction,
+  });
+});
+
+export const deleteTransaction = asyncHandler(async (req, res) => {
+  const { transactionId } = req.params;
+
+  const transaction = await deleteTransactionById(transactionId);
+  return res.status(transaction ? 200 : 404).json({
+    success: transaction ? true : false,
+    message: transaction
+      ? "Xóa giao dịch thành công."
+      : "Giao dịch không tồn tại.",
   });
 });

@@ -91,15 +91,37 @@ const resetPasswordFields = {
   }),
 };
 const getValidationSchema = (type) => {
-  if (type === "register") {
-    return Joi.object(registerFields);
-  }
+  // if (type === "register") {
+  //   return Joi.object(registerFields);
+  // }
 
-  if (type === "login") return Joi.object(loginFields);
-  if (type === "forgot-password") return Joi.object(forgotPasswordFields);
-  if (type === "reset-password") return Joi.object(resetPasswordFields);
+  // if (type === "login") return Joi.object(loginFields);
+  // if (type === "forgot-password") return Joi.object(forgotPasswordFields);
+  // if (type === "reset-password") return Joi.object(resetPasswordFields);
+
+  switch (type) {
+    case "register":
+      return Joi.object(registerFields);
+      break;
+
+    case "login":
+      return Joi.object(loginFields);
+      break;
+
+    case "forgot-password":
+      return Joi.object(forgotPasswordFields);
+      break;
+    case "reset-password":
+      return Joi.object(resetPasswordFields);
+      break;
+
+    default:
+      "";
+      break;
+  }
 };
 
+// handle error
 export const validateRequest = (type) => {
   return (req, res, next) => {
     const schema = getValidationSchema(type);
@@ -111,7 +133,7 @@ export const validateRequest = (type) => {
     if (error) {
       const errors = error.details.map((err) => ({
         message: err.message,
-        Trường: err.context.key, // Thêm trường bị lỗi
+        Trường: err.context.key,
       }));
       return res.status(400).json({ success: false, errors });
     }

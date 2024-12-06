@@ -1,7 +1,11 @@
 import {
-  getAllUsers,
+  addUser,
+  checkUsernameUser,
+  getAllUser,
   getProfile,
+  removeUser,
   updateProfile,
+  updateUserInfo,
 } from "../services/user.services.js";
 import asyncHandler from "express-async-handler";
 import { checkPassword, hashPasswrod } from "../utils/password.js";
@@ -64,21 +68,6 @@ export const changeUserPassword = async (req, res) => {
   });
 };
 
-export const getUsers = asyncHandler(async (req, res, next) => {
-  const { email, username } = req.query;
-
-  const query = {};
-  if (email) query.email = email;
-  if (username) query.username = username;
-  const User = await getAllUsers(query);
-
-  return res.status(User ? 200 : 404).json({
-    success: User ? true : false,
-    message: User ? "Danh sách người dùng" : "Không tìm thấy người dùng",
-    user: User ? User : "",
-  });
-});
-
 export const changeUserRole = asyncHandler(async (req, res) => {
   const { userId } = req.params;
   const { newRole } = req.body;
@@ -107,20 +96,39 @@ export const changeUserRole = asyncHandler(async (req, res) => {
   });
 });
 
-export const deleteUser = asyncHandler(async (req, res) => {
-  const { userId } = req.params;
-  const user = await removeUser(userId);
+// LIBRARIAN
 
-  if (!user) {
-    return res.status(404).json({
+export const createUser = asyncHandler(async (req, res, next) => {
+  const { username, password } = req.body;
+
+  const Username = await checkUsernameUser(username);
+  if (Username) {
+    return res.status(500).json({
       success: false,
-      message: "Người dùng không tồn tại",
+      message: "Tên người dùng đã tồn tại",
     });
   }
+  const user = await addUser(username, password);
 
   return res.status(200).json({
     success: true,
-    message: "Đã xóa người dùng thành công",
+    message: "Tạo người dùng thành công",
+    user,
+  });
+});
+
+export const getUsers = asyncHandler(async (req, res, next) => {
+  const { username } = req.query;
+
+  const query = {};
+  query.role = "user";
+  if (username) query.username = username;
+  const User = await getAllUser(query);
+
+  return res.status(User ? 200 : 404).json({
+    success: User ? true : false,
+    message: User ? "Danh sách người dùng" : "Không tìm thấy người dùng",
+    user: User ? User : "",
   });
 });
 
@@ -128,14 +136,96 @@ export const updateUser = asyncHandler(async (req, res) => {
   const { userId } = req.params;
   const updatedData = req.body;
 
+  if (!req.body || Object.keys(req.body).length === 0) {
+    return res.status(400).json({
+      success: fasle,
+      message: "Thông tin cập nhật là bắt buộc",
+    });
+  }
+
   const data = { ...updatedData };
   if (req.file) data.avatar = req.file.path;
+
   const User = await updateUserInfo(userId, data);
   return res.status(User ? 200 : 500).json({
     success: User ? true : false,
     message: User
       ? `Cập nhật thông tin người dùng thành công`
       : "Cập nhật thông tin người dùng thất bại",
-    user: User,
+    user: User ? User : "",
+  });
+});
+
+export const deleteUser = asyncHandler(async (req, res) => {
+  const { userId } = req.params;
+  const user = await removeUser(userId);
+
+  return res.status(user ? 200 : 404).json({
+    success: user ? true : false,
+    message: user ? "Đã xóa người dùng thành công" : "Người dùng không tồn tại",
+    user: user ? user : "",
+  });
+});
+
+// ADMIN
+export const getAllUsersByAdmin = asyncHandler(async (req, res) => {
+  const { username, email, role } = req.query;
+
+  const query = {};
+  if (username) query.username = new RegExp(username, "i");
+  if (email) query.email = new RegExp(email, "i");
+  if (role) query.role = role;
+
+  const users = await getAllUser(query);
+
+  return res.status(users ? 200 : 404).json({
+    success: users ? true : false,
+    message: users ? "Danh sách người dùng." : "Không tìm thấy người dùng",
+    users,
+  });
+});
+
+export const getUserDetailsByAdmin = asyncHandler(async (req, res) => {
+  const { userId } = req.params;
+
+  const user = await getProfile({ userId });
+  return res.status(user ? 200 : 404).json({
+    success: user ? true : false,
+    message: user ? "Chi tiết người dùng." : "Không tìm thấy người dùng",
+    user,
+  });
+});
+
+export const updateUserByAdmin = asyncHandler(async (req, res) => {
+  const { userId } = req.params;
+  const updatedData = req.body;
+
+  if (!req.body || Object.keys(req.body).length === 0) {
+    return res.status(400).json({
+      success: fasle,
+      message: "Thông tin cập nhật là bắt buộc",
+    });
+  }
+
+  const data = { ...updatedData };
+  if (req.file) data.avatar = req.file.path;
+  const user = await updateProfile(userId, data);
+  return res.status(user ? 200 : 500).json({
+    success: user ? true : false,
+    message: user
+      ? `Cập nhật thông tin thành công`
+      : "Cập nhật thông tin thất bại",
+    user,
+  });
+});
+
+export const deleteUserByAdmin = asyncHandler(async (req, res) => {
+  const { userId } = req.params;
+  const user = await removeUser(userId);
+
+  return res.status(user ? 200 : 404).json({
+    success: user ? true : false,
+    message: user ? "Đã xóa người dùng thành công" : "Người dùng không tồn tại",
+    user: user ? user : "",
   });
 });

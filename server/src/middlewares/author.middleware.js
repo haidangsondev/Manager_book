@@ -24,7 +24,7 @@ const getValidationSchema = (type) => {
   }
 };
 
-export const validateRequest = (type) => {
+export const validateAuthor = (type) => {
   return (req, res, next) => {
     const schema = getValidationSchema(type);
 

@@ -12,7 +12,6 @@ const userSchema = new mongoose.Schema(
     },
     email: {
       type: String,
-      required: true,
       validate: validator.isEmail,
     },
     password: {
@@ -88,7 +87,7 @@ const userSchema = new mongoose.Schema(
     },
     role: {
       type: String,
-      enum: ["admin", "user"],
+      enum: ["admin", "user", "librarian"],
       default: "user",
     },
   },

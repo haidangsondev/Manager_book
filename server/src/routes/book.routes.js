@@ -1,22 +1,34 @@
 import express from "express";
-import { validateRequest } from "../middlewares/book.middleware.js";
-import { verifyAccessToken, verifyIsAdmin } from "../utils/jwt.js";
+import { validateBook } from "../middlewares/book.middleware.js";
+import { verifyAccessToken, verifyIsLibrarian } from "../utils/jwt.js";
 import {
   createBook,
   editBook,
   removeBook,
   getBooks,
   getBookId,
-  manageBookQuantity,
+  createReview,
+  removeReview,
+  getBookReviews,
+  getBookReviewById,
+  deleteBookReview,
 } from "../controllers/book.controllers.js";
 
 const router = express.Router();
 
-router.use(verifyAccessToken, verifyIsAdmin);
+router.use(verifyAccessToken);
 router.get("/", getBooks);
 router.get("/:bookId", getBookId);
-router.post("/", validateRequest("book"), createBook);
+router.post("/review/:bookId", validateBook("review"), createReview);
+router.delete("/review/:reviewId", removeReview);
+
+// LIBRARIAN
+router.use(verifyAccessToken, verifyIsLibrarian);
+router.post("/", validateBook("book"), createBook);
 router.put("/:bookId", editBook);
 router.delete("/:bookId", removeBook);
-router.patch("/update-quantity/:bookId", manageBookQuantity);
+router.get("/review", getBookReviews);
+router.get("/review/:reviewId", getBookReviewById);
+router.delete("/review/:reviewId", deleteBookReview);
+
 export default router;

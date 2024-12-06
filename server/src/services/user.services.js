@@ -1,4 +1,5 @@
 import userModel from "../models/user.models.js";
+import { hashPasswrod } from "../utils/password.js";
 
 export const getProfile = async ({ user_id }) => {
   const response = await userModel
@@ -19,9 +20,6 @@ export const changePasswordProfile = async (_id, password) => {
     .select("-password -refreshToken -emailToken");
 };
 
-export const getAllUsers = async () => {
-  return await userModel.find().select("-password -refreshToken");
-};
 export const updateUserRole = async (userId, newRole) => {
   return await userModel.findByIdAndUpdate(
     userId,
@@ -29,6 +27,25 @@ export const updateUserRole = async (userId, newRole) => {
     { new: true }
   );
 };
+
+export const checkUsernameUser = async (username) => {
+  return await userModel.findOne({ username });
+};
+
+export const addUser = async (username, password) => {
+  const user = await userModel.create({
+    username,
+    password: await hashPasswrod(password),
+    isVerify: true,
+  });
+
+  return user;
+};
+
+export const getAllUser = async (query) => {
+  return await userModel.find(query).select("-password -refreshToken");
+};
+
 export const removeUser = async (userId) => {
   return await userModel.findByIdAndDelete(userId);
 };

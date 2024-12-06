@@ -1,6 +1,6 @@
 import express from "express";
-import { validateRequest } from "../middlewares/category.middleware.js";
-import { verifyAccessToken, verifyIsAdmin } from "../utils/jwt.js";
+import { validateCategory } from "../middlewares/category.middleware.js";
+import { verifyAccessToken, verifyIsLibrarian } from "../utils/jwt.js";
 import {
   createCategory,
   deleteCategory,
@@ -10,9 +10,9 @@ import {
 
 const router = express.Router();
 
-router.use(verifyAccessToken, verifyIsAdmin);
-router.post("/", validateRequest("category"), createCategory);
-router.put("/:id", validateRequest("category"), updateCategory);
+router.use(verifyAccessToken, verifyIsLibrarian);
+router.post("/", validateCategory("category"), createCategory);
+router.put("/:id", updateCategory);
 router.get("/", getCategories);
 router.delete("/:id", deleteCategory);
 export default router;

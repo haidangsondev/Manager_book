@@ -9,11 +9,13 @@ const bookSchema = new mongoose.Schema(
       maxlength: 256,
     },
     author: {
-      type: String,
+      type: mongoose.Schema.Types.ObjectId,
+      ref: "Author",
       required: true,
     },
     category: {
-      type: String,
+      type: mongoose.Schema.Types.ObjectId,
+      ref: "Category",
       required: true,
     },
     isbn: {
@@ -23,12 +25,19 @@ const bookSchema = new mongoose.Schema(
       trim: true,
     },
     publisher: {
-      type: String,
-      trim: true,
+      type: mongoose.Schema.Types.ObjectId,
+      ref: "Publisher",
+      required: true,
     },
     year_published: {
       type: Number,
       min: 0,
+      validate: {
+        validator: function (value) {
+          return value <= new Date().getFullYear();
+        },
+        message: "Năm xuất bản không được vượt quá năm hiện tại.",
+      },
     },
     total_copies: {
       type: Number,
@@ -39,6 +48,13 @@ const bookSchema = new mongoose.Schema(
       type: Number,
       required: true,
       min: 0,
+      validate: {
+        validator: function (value) {
+          return value + this.reserved_copies <= this.total_copies;
+        },
+        message:
+          "Số lượng có sẵn và đặt trước không được vượt quá tổng số bản sao.",
+      },
     },
     reserved_copies: {
       type: Number,
@@ -52,7 +68,7 @@ const bookSchema = new mongoose.Schema(
     },
     status: {
       type: String,
-      enum: ["có sẵn", "đã mượng", "đặt trước", "mất", "bị hỏng"],
+      enum: ["có sẵn", "đã mượn", "đặt trước", "mất", "bị hỏng"],
       default: "có sẵn",
     },
   },

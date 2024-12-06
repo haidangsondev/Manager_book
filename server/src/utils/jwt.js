@@ -41,3 +41,14 @@ export const verifyIsAdmin = asyncHandler(async (req, res, next) => {
   }
   next();
 });
+
+export const verifyIsLibrarian = asyncHandler(async (req, res, next) => {
+  const { role } = req.user;
+  if (role !== "librarian") {
+    return res.status(401).json({
+      success: false,
+      message: "Quyền truy cập là thủ thư",
+    });
+  }
+  next();
+});

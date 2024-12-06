@@ -1,20 +1,33 @@
 import transactionModel from "../models/transaction.model.js";
 
-export const borrowBookUser = async ({ user_id, book_id, due_date }) => {
-  return await transactionModel.create({
-    user_id,
-    book_id,
-    due_date,
-  });
+export const borrowBookUser = async (data) => {
+  return await transactionModel.create(data);
 };
 
 export const getborrowBookUser = async ({ user_id, book_id, status }) => {
-  return await transactionModel.findOne({ user_id, book_id, status });
+  return await transactionModel.findOne({ user_id, book_id, status }).exec();
 };
 
 export const getHistoryBorrowBooked = async (_id) => {
   return await transactionModel
     .find({ user_id: _id })
-    .populate("book_id", "title")
-    .populate("user_id", "username");
+    .populate("book_id", "title");
+};
+
+export const getTransactions = async () => {
+  return await transactionModel
+    .find()
+    .populate("user_id", "username")
+    .populate("book_id", "title");
+};
+
+export const getTransactionById = async (id) => {
+  return await transactionModel
+    .findById(id)
+    .populate("user_id", "username email")
+    .populate("book_id", "title author");
+};
+
+export const deleteTransactionById = async (id) => {
+  return await transactionModel.findByIdAndDelete(id);
 };

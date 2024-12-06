@@ -21,7 +21,7 @@ const getValidationSchema = (type) => {
   }
 };
 
-export const validateRequest = (type) => {
+export const validateCategory = (type) => {
   return (req, res, next) => {
     const schema = getValidationSchema(type);
 

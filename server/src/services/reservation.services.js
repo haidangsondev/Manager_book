@@ -1,16 +1,15 @@
 import reservationModel from "../models/reservation.models.js";
 
-export const createReservation = async (_id, bookId, expiryDate) => {
-  return await reservationModel.create({
-    user_id: _id,
-    book_id: bookId,
-    expiry_date: expiryDate,
-  });
+export const createReservation = async (data) => {
+  return await reservationModel.create(data);
 };
 
-export const getUserReservations = async (_id) => {
+export const getUserReservations = async (data) => {
+  return await reservationModel.find(data).populate("book_id", "title author");
+};
+export const getUserReservationById = async (id) => {
   return await reservationModel
-    .find({ user_id: _id })
+    .findById(id)
     .populate("book_id", "title author");
 };
 
@@ -20,4 +19,23 @@ export const cancelReservation = async (reservation_id) => {
     { status: "hủy" },
     { new: true }
   );
+};
+
+export const getAllReservation = async (query) => {
+  return await reservationModel
+    .find(query)
+    .populate("user_id", "username email")
+    .populate("book_id", "title author")
+    .sort({ reservation_date: -1 });
+};
+
+export const deleteReservationById = async (reservationId) => {
+  return await reservationModel.findByIdAndDelete(reservationId);
+};
+
+export const updateReservationByStatus = async (reservationId, status) => {
+  return await reservationModel
+    .findByIdAndUpdate(reservationId, { status }, { new: true })
+    .populate("user_id", "username email")
+    .populate("book_id", "title author");
 };
