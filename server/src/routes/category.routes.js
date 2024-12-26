@@ -12,7 +12,7 @@ const router = express.Router();
 
 router.use(verifyAccessToken, verifyIsLibrarian);
 router.post("/", validateCategory("category"), createCategory);
-router.put("/:id", updateCategory);
+router.put("/:categoryId", updateCategory);
 router.get("/", getCategories);
-router.delete("/:id", deleteCategory);
+router.delete("/:categoryId", deleteCategory);
 export default router;

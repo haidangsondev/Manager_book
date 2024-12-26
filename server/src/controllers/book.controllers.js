@@ -14,6 +14,77 @@ import {
 import { getCategoryBookId } from "../services/category.services.js";
 import { getAuthorId } from "../services/author.services.js";
 import { getPublisherId } from "../services/publisher.services.js";
+import { getProfile } from "../services/user.services.js";
+
+export const getBooks = asyncHandler(async (req, res) => {
+  const { search } = req.query;
+
+  let queryObject = {};
+  if (req.query.search) {
+    // Cập nhật đối tượng truy vấn với điều kiện tìm kiếm là tiêu đề
+    queryObject = {
+      $or: [{ title: { $regex: req.query.search, $options: "i" } }],
+    };
+  }
+
+  const books = await getAllBooks(queryObject);
+
+  return res.status(books.length > 0 ? 200 : 404).json({
+    success: books.length > 0 ? true : false,
+    message: books.length > 0 ? "Danh sách sách" : "Không tìm thấy sách",
+    data: books,
+  });
+});
+
+export const getBookId = asyncHandler(async (req, res) => {
+  const { bookId } = req.params;
+
+  const book = await getBook(bookId);
+  return res.status(book ? 200 : 404).json({
+    success: book ? true : false,
+    message: book ? "Chi tiết sách" : "Không tìm thấy sách",
+    data: book,
+  });
+});
+
+export const createReview = asyncHandler(async (req, res) => {
+  const { rating, comment } = req.body;
+  const { _id } = req.user;
+  const { bookId } = req.params;
+
+  const data = { book_id: bookId, user_id: _id, rating, comment };
+  const review = await addReview(data);
+
+  return res.status(review ? 201 : 500).json({
+    success: review ? true : false,
+    message: review
+      ? "Đánh giá sách thành công"
+      : "Có xảy rã lỗi hệ thống khi đánh giá sách",
+  });
+});
+
+export const removeReview = asyncHandler(async (req, res) => {
+  const { reviewId } = req.params;
+  const { _id } = req.user;
+
+  const user = await getProfile(_id);
+  if (!user) {
+    return res.status(500).json({
+      success: false,
+      message: "Bạn không có quyèn xóa",
+    });
+  }
+  const review = await deleteReview(reviewId);
+
+  return res.status(review ? 201 : 500).json({
+    success: review ? true : false,
+    message: review
+      ? "Xóa đánh giá thành công"
+      : "Xóa đánh giá không thành công",
+  });
+});
+
+// LIBRARIAN
 
 export const createBook = asyncHandler(async (req, res) => {
   const { category, author, publisher } = req.body;
@@ -50,44 +121,6 @@ export const createBook = asyncHandler(async (req, res) => {
   });
 });
 
-export const getBooks = asyncHandler(async (req, res) => {
-  const { title, categoryId, authorId, publisherId } = req.query;
-  const query = {};
-
-  if (title) {
-    query.title = { $regex: title, $options: "i" };
-  }
-
-  if (categoryId) {
-    query.category = new mongoose.Types.ObjectId(categoryId);
-  }
-
-  if (authorId) {
-    query.author = new mongoose.Types.ObjectId(authorId);
-  }
-  if (publisherId) {
-    query.author = new mongoose.Types.ObjectId(publisherId);
-  }
-
-  const books = await getAllBooks(query);
-  return res.status(books ? 200 : 404).json({
-    success: books ? true : false,
-    message: books ? "Danh sách sách" : "Không tìm thấy sách",
-    books: books ? books : [],
-  });
-});
-
-export const getBookId = asyncHandler(async (req, res) => {
-  const { bookId } = req.params;
-
-  const book = await getBook(bookId);
-  return res.status(book ? 200 : 404).json({
-    success: book ? true : false,
-    message: book ? "Chi tiết sách" : "Không tìm thấy sách",
-    book: book ? book : "",
-  });
-});
-
 export const editBook = asyncHandler(async (req, res) => {
   const { bookId } = req.params;
 
@@ -110,48 +143,21 @@ export const removeBook = asyncHandler(async (req, res) => {
   const { bookId } = req.params;
   const deletedBook = await deleteBook(bookId);
   return res.status(deletedBook ? 200 : 404).json({
-    success: !!deletedBook,
+    success: deletedBook ? true : false,
     message: deletedBook ? "Xóa sách thành công" : "Không tìm thấy sách",
   });
 });
 
-export const createReview = asyncHandler(async (req, res) => {
-  const { rating, comment } = req.body;
-  const { _id } = req.user;
-  const { bookId } = req.params;
-
-  const data = { book_id: bookId, user_id: _id, rating, comment };
-  const review = await addReview(data);
-
-  return res.status(review ? 201 : 404).json({
-    success: review ? true : false,
-    message: review ? "Đánh giá sách thành công" : "Đánh giá không thành công",
-    review: review ? review : "",
-  });
-});
-
-export const removeReview = asyncHandler(async (req, res) => {
-  const { reviewId } = req.params;
-  const review = await deleteReview(reviewId);
-
-  return res.status(review ? 201 : 404).json({
-    success: review ? true : false,
-    message: review
-      ? "Xóa đánh giá thành công"
-      : "Xóa đánh giá không thành công",
-    review: review ? review : "",
-  });
-});
-
-// LIBRARIAN
 export const getBookReviews = asyncHandler(async (req, res) => {
-  const reviews = await getReviewsBook({});
+  const reviews = await getReviewsBook();
+  console.log(reviews);
   return res.status(reviews ? 201 : 404).json({
     success: reviews ? true : false,
     message: reviews ? "Danh sách đánh giá" : "Không tìm thấy đánh giá",
     reviews: reviews ? reviews : "",
   });
 });
+
 export const getBookReviewById = asyncHandler(async (req, res) => {
   const { reviewId } = req.params;
   const review = await getReviewBook(reviewId);

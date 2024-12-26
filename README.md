@@ -56,9 +56,13 @@ Dự án sử dụng mô hình Model-Controller-Services, bao gồm:
 4. Chạy dự án:
 - npm run dev
    ```bash
-   "dev": "nodemon index.js"
+   "dev": "cross-env NODE_ENV=development nodemon index.js"
    ```
-5. Truy cập hệ thống qua đường dẫn:
+- npm test
+   ```bash
+    "test": "cross-env NODE_ENV=test jest --detectOpenHandles",
+   ```
+1. Truy cập hệ thống qua đường dẫn:
    ```
    http://localhost:7000
    ```

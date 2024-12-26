@@ -1,31 +1,16 @@
 import userModel from "../models/user.models.js";
 import { hashPasswrod } from "../utils/password.js";
 
-export const getProfile = async ({ user_id }) => {
-  const response = await userModel
-    .findOne({ user_id })
-    .select(" -refreshToken -emailToken");
-  return response;
+export const getProfile = async (_id) => {
+  return await userModel
+    .findById(_id)
+    .select(" -refreshToken -emailToken  -passwordResetToken");
 };
 
 export const updateProfile = async (_id, data) => {
   return await userModel
     .findByIdAndUpdate(_id, data, { new: true })
-    .select("-password -refreshToken -emailToken");
-};
-
-export const changePasswordProfile = async (_id, password) => {
-  return await userModel
-    .findByIdAndUpdate(_id, password, { new: true })
-    .select("-password -refreshToken -emailToken");
-};
-
-export const updateUserRole = async (userId, newRole) => {
-  return await userModel.findByIdAndUpdate(
-    userId,
-    { role: newRole },
-    { new: true }
-  );
+    .select("-password -refreshToken -emailToken -passwordResetToken");
 };
 
 export const checkUsernameUser = async (username) => {
@@ -33,26 +18,19 @@ export const checkUsernameUser = async (username) => {
 };
 
 export const addUser = async (username, password) => {
-  const user = await userModel.create({
+  return await userModel.create({
     username,
     password: await hashPasswrod(password),
     isVerify: true,
   });
-
-  return user;
 };
 
 export const getAllUser = async (query) => {
   return await userModel.find(query).select("-password -refreshToken");
 };
 
-export const removeUser = async (userId) => {
-  return await userModel.findByIdAndDelete(userId);
-};
-export const updateUserInfo = async (user_id, data) => {
-  return await userModel
-    .findByIdAndUpdate(user_id, data, { new: true })
-    .select("-password -refreshToken -emailToken");
+export const removeUser = async (id) => {
+  return await userModel.findByIdAndDelete(id);
 };
 
 export const addBorrowed = async (_id, book_id) => {

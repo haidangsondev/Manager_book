@@ -12,10 +12,13 @@ app.use(cookieParser());
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
+if (process.env.NODE_ENV === "development") {
+  dbConnect();
+}
 initialRouter(app);
 
-dbConnect();
-
-app.listen(port, () => {
+export const server = app.listen(port, () => {
   console.log(`Example app listening on port ${port}`);
 });
+
+export default app;

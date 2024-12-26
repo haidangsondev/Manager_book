@@ -3,7 +3,7 @@ import {
   checkPasswordToken,
   checkUserRefreshAccessToken,
   registerUser,
-  updateUserLogin,
+  updateUser,
 } from "../services/auth.services.js";
 import asyncHandler from "express-async-handler";
 import { sendEmail } from "../utils/sendEmail.js";
@@ -15,14 +15,13 @@ import jwt from "jsonwebtoken";
 
 export const register = asyncHandler(async (req, res, next) => {
   const { email } = req.body;
+
   const Email = await checkEmail(email);
   if (Email) {
-    return res.status(500).json({
-      success: false,
-      message: "Email đã tồn tại",
-    });
+    throw new Error("Email đã tồn tại");
   }
 
+  // Tạo registerToken để lưu vào cookie
   const registerToken = uniqid();
   res.cookie(
     "data_book_register",
@@ -30,18 +29,21 @@ export const register = asyncHandler(async (req, res, next) => {
       ...req.body,
       registerToken,
     },
+    // Hạn sử dụng của cookie là 15 phút
     { maxAge: 15 * 60 * 1000, httpOnly: true }
   );
 
-  const html = `Để xác thực tài khoản email, bạn cần nhấn vào link và hiệu lực là 15 phút. Xin cảm ơn <a href="${process.env.URL_SERVER}/api/auth/finalRegister/${registerToken}">Nhấn vào link</a>`;
-  const subject = "Đăng ký tài khoản";
-
+  const html = `Đây là mã để bạn xác thực tài khoản email và hiệu lực là 15 phút. Mã<b>  ${registerToken}</b>`;
+  const subject = "Xác thực tài khoản";
   const data = {
     email,
     subject,
     html,
   };
+
+  // Gửi email để xác thực người dùng
   await sendEmail(data);
+
   return res.status(200).json({
     success: true,
     message: "Kiểm tra email để xác thực tài khoản đã đăng ký",
@@ -51,8 +53,9 @@ export const register = asyncHandler(async (req, res, next) => {
 
 export const finalRegister = asyncHandler(async (req, res, next) => {
   const { register_token } = req.params;
-  const cookie = req.cookies?.data_book_register;
+  const cookie = JSON.parse(req.cookies?.data_book_register || "{}");
 
+  // Kiểm tra mã xác thực của người dùng qua email đã đăng ký
   if (!cookie || cookie.registerToken !== register_token) {
     res.clearCookie("data_book_register");
     return res.status(500).json({
@@ -61,18 +64,24 @@ export const finalRegister = asyncHandler(async (req, res, next) => {
     });
   }
 
+  // Truy xuất các tài liệu đã lưu trong cookie để tạo tài khoản cho người dùng
   const { username, email, password, registerToken } = cookie;
-  const response = await registerUser({
+  const data = {
     username,
     email,
-    password,
-    registerToken,
-  });
+    password: await hashPasswrod(password),
+    emailToken: registerToken,
+    isVerify: true,
+  };
 
+  const response = await registerUser(data);
+
+  // Xóa các thông tin đã lưu khi đã xác thực mã qua email lúc đăng ký
   res.clearCookie("data_book_register", {
     httpOnly: true,
     secure: true,
   });
+
   return res.status(200).json({
     success: true,
     message: "Xác thực tài khoản email thành công",
@@ -82,27 +91,36 @@ export const finalRegister = asyncHandler(async (req, res, next) => {
 
 export const loginUser = asyncHandler(async (req, res) => {
   const { email, password } = req.body;
-  await hashPasswrod(password);
-  const User = await checkEmail({ email });
+
+  // Kiểm tra người dùng đã đăng ký/tồn tại qua hàm checkEmail
+  // Kiểm tra mật khẩu có hợp lệ so với lúc đăng ký qua hàm checkPassword
+  const User = await checkEmail(email);
   if (!(User && (await checkPassword(password, User.password)))) {
     throw new Error("Email hoặc Password không hợp lệ");
   }
 
+  // Lấy các thông tin cần thiêt của người dùng sau khi kiểm tra thành công
   const {
     password: isPassword,
     refreshToken: refresh_token,
     passwordChangeAt,
     role,
+    emailToken,
     ...userData
   } = User.toObject();
+
   const accessToken = signAccessToken(User._id, role);
   const refreshToken = signRefreshToken(User._id);
 
-  await updateUserLogin({ user_id: User._id, refreshToken });
+  await updateUser(User._id, { refreshToken });
+
+  // Lưu thông tin refreshToken vào cookie để xác thực người dùng khi có các yêu cầu gửi đến
+  // Hạn sử dùng trong cookie là 7 ngày
   res.cookie("refresh_book_token", refreshToken, {
     httpOnly: true,
     maxAge: 7 * 24 * 60 * 60 * 1000,
   });
+
   return res.status(200).json({
     success: true,
     message: "Đăng nhập thành công",
@@ -114,11 +132,15 @@ export const loginUser = asyncHandler(async (req, res) => {
 export const logoutUser = asyncHandler(async (req, res) => {
   const cookie = req.cookies;
   const { _id } = req.user;
+
+  // Xác thực thông tin người dùng khi có yêu cầu gửi đến
   if (!cookie || !cookie.refresh_book_token) {
     throw new Error("Không tìm thấy refresh token ");
   }
-  await updateUserLogin({ user_id: _id, refreshToken: "" });
 
+  await updateUser(_id, { refreshToken: "" });
+
+  // Xóa refreshToken khỏi cookie sau khi đăng xuất
   res.clearCookie("refresh_book_token", {
     httpOnly: true,
     secure: true,
@@ -133,21 +155,21 @@ export const logoutUser = asyncHandler(async (req, res) => {
 export const forgotPassword = asyncHandler(async (req, res) => {
   const { email } = req.body;
 
-  const User = await checkEmail({ email });
+  const User = await checkEmail(email);
   if (!User) {
     throw new Error("Email không tồn tại");
   }
   const passwordResetToken = await User.createPasswordToken();
   await User.save();
 
-  const html = `Để lấy lại mật khẩu, xin vui lòng nhân vào link này. Lưu ý hiệu lực của link chỉ có 15 phút, xin cảm ơn <a href=${process.env.URL_CLIENT}/reset-password/${passwordResetToken}>Nhấn vào đây</a>`;
+  const html = `Đây là mã bạn cần để xác thực tài khoản email để thực hiện đổi mật khẩu và hiệu lực là 15 phút. Mã <b> ${passwordResetToken} </b>`;
   const subject = "Quên mật khẩu";
-
   const data = {
     email,
     html,
     subject,
   };
+  // Gửi email để xác thực mã người dùng
   await sendEmail(data);
   return res.status(200).json({
     success: true,
@@ -159,19 +181,22 @@ export const forgotPassword = asyncHandler(async (req, res) => {
 export const resetPassword = asyncHandler(async (req, res) => {
   const { password, tokenPassword } = req.body;
 
+  // Tạo mã băm dạng(token) cho cho mật khẩu
   const passwordResetToken = crypto
     .createHash("sha256")
     .update(tokenPassword)
     .digest("hex");
 
-  const User = await checkPasswordToken({
-    passwordResetToken,
-  });
+  const User = await checkPasswordToken(passwordResetToken);
 
   if (!User) {
-    throw new Error("Người dùng không tồn tại");
+    return res.status(500).json({
+      success: false,
+      message: "Mã xác thực không tồn tại hoặc đã hết hạn",
+    });
   }
 
+  // Cập nhật thời gian xác thực token của mật khẩu
   User.password = await hashPasswrod(password);
   User.passwordResetToken = undefined;
   User.passwordResetExpires = undefined;
@@ -190,7 +215,9 @@ export const refreshAccessToken = asyncHandler(async (req, res) => {
     throw new Error("Không tìm thấy refresh token ");
   }
 
+  // Xác thực người dùng
   jwt.verify(
+    // refreshTonken của người dùng đã lưu vào cookie khi đăng nhập thành công
     cookie.refresh_token,
     process.env.JWT_SECRETKEY,
     async (err, decode) => {

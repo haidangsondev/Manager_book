@@ -4,8 +4,8 @@ export const borrowBookUser = async (data) => {
   return await transactionModel.create(data);
 };
 
-export const getborrowBookUser = async ({ user_id, book_id, status }) => {
-  return await transactionModel.findOne({ user_id, book_id, status }).exec();
+export const getborrowBookUser = async (data) => {
+  return await transactionModel.findOne(data).exec();
 };
 
 export const getHistoryBorrowBooked = async (_id) => {

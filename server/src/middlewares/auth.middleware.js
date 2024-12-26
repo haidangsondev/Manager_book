@@ -1,47 +1,32 @@
 import Joi from "joi";
 
 const registerFields = {
-  username: Joi.string()
-    .min(5)
-    .messages({
-      "string.min": "Tên người dùng phải có ít nhất 5 ký tự.",
-    })
-    .max(30)
-    .messages({
-      "string.max": "Tên người dùng không được vượt quá 30 ký tự.",
-    })
-    .required()
-    .messages({
-      "any.required": "Tên người dùng là bắt buộc.",
-    }),
-  email: Joi.string()
-    .email()
-    .messages({
-      "string.email": "Email không hợp lệ.",
-    })
-    .required()
-    .messages({
-      "any.required": "Email là bắt buộc.",
-    }),
-
+  username: Joi.string().min(5).required().messages({
+    "string.base": "Tên người dùng phải là chuỗi.",
+    "string.min": "Tên người dùng phải có ít nhất 5 ký tự.",
+    "any.required": "Tên người dùng là bắt buộc.",
+  }),
+  email: Joi.string().email().required().messages({
+    "string.email": "Email không hợp lệ.",
+    "any.required": "Email là bắt buộc.",
+  }),
   password: Joi.string()
     .min(8)
+    .required()
+    .pattern(
+      /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[!@#$%^&*()_+{}|:<>?]).{8,30}$/
+    )
     .messages({
       "string.min": "Mật khẩu phải có ít nhất 8 ký tự.",
-    })
-    .required()
-    .messages({
+      "string.pattern.base":
+        "Mật khẩu phải chứa ít nhất: một chữ cái viết hoa, một chữ cái viết thường, một số và một ký tự đặc biệt.",
+
       "any.required": "Mật khẩu là bắt buộc.",
     }),
-  confirmPassword: Joi.string()
-    .valid(Joi.ref("password"))
-    .messages({
-      "any.only": "Mật khẩu xác nhận không khớp.",
-    })
-    .required()
-    .messages({
-      "any.required": "Xác nhận mật khẩu là bắt buộc.",
-    }),
+  confirmPassword: Joi.string().valid(Joi.ref("password")).required().messages({
+    "any.only": "Mật khẩu xác nhận không khớp.",
+    "any.required": "Xác nhận mật khẩu là bắt buộc.",
+  }),
 };
 const loginFields = {
   email: Joi.string()

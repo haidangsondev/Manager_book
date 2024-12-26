@@ -4,22 +4,26 @@ import dotenv from "dotenv";
 dotenv.config();
 
 export const sendEmail = asyncHandler(async ({ email, subject, html }) => {
-  const transporter = nodemailer.createTransport({
-    host: "smtp.gmail.com",
-    port: 587,
-    secure: false, // true for port 465, false for other ports
-    auth: {
-      user: process.env.EMAIL_NAME,
-      pass: process.env.APP_PASSWORD,
-    },
-  });
+  try {
+    const transporter = nodemailer.createTransport({
+      host: "smtp.gmail.com",
+      port: 587,
+      secure: false,
+      auth: {
+        user: process.env.EMAIL_NAME,
+        pass: process.env.APP_PASSWORD,
+      },
+    });
 
-  const info = await transporter.sendMail({
-    from: '"Twiter app 👻" <haidangson.dev@gmail.com>', // sender address
-    to: email, // list of receivers
-    subject: subject, // Subject line
-    html: html, // html body
-  });
+    const info = await transporter.sendMail({
+      from: '"Manager book 👻" <haidangson.dev@gmail.com>',
+      to: email,
+      subject: subject,
+      html: html,
+    });
 
-  return info;
+    return info;
+  } catch (error) {
+    throw new Error("Quá trình gửi email bị lỗi");
+  }
 });

@@ -39,6 +39,7 @@ export const validatePublisher = (type) => {
       abortEarly: false,
     });
 
+    console.log(error);
     if (error) {
       const errors = error.details.map((err) => ({
         message: err.message,

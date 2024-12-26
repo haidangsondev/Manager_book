@@ -13,9 +13,9 @@ export const getUserReservationById = async (id) => {
     .populate("book_id", "title author");
 };
 
-export const cancelReservation = async (reservation_id) => {
+export const cancelReservation = async (id) => {
   return await reservationModel.findByIdAndUpdate(
-    reservation_id,
+    id,
     { status: "hủy" },
     { new: true }
   );
@@ -29,13 +29,13 @@ export const getAllReservation = async (query) => {
     .sort({ reservation_date: -1 });
 };
 
-export const deleteReservationById = async (reservationId) => {
-  return await reservationModel.findByIdAndDelete(reservationId);
+export const deleteReservationById = async (id) => {
+  return await reservationModel.findByIdAndDelete(id);
 };
 
-export const updateReservationByStatus = async (reservationId, status) => {
+export const updateReservationByStatus = async (id, status) => {
   return await reservationModel
-    .findByIdAndUpdate(reservationId, { status }, { new: true })
+    .findByIdAndUpdate(id, { status }, { new: true })
     .populate("user_id", "username email")
     .populate("book_id", "title author");
 };

@@ -14,8 +14,6 @@ import {
   updateUserProfile,
   getAllUsersByAdmin,
   getUserDetailsByAdmin,
-  updateUserByAdmin,
-  deleteUserByAdmin,
 } from "../controllers/user.controllers.js";
 import uploadCloud from "../utils/cloudinary.js";
 import { validateUser } from "../middlewares/user.middleware.js";
@@ -40,8 +38,8 @@ router.delete("/:userId", deleteUser);
 
 // ADMIN
 router.use(verifyAccessToken, verifyIsAdmin);
-router.get("/admin/", getAllUsersByAdmin);
+router.get("/admin", getAllUsersByAdmin);
 router.get("/admin/:userId", getUserDetailsByAdmin);
-router.patch("/admin/:userId", updateUserByAdmin);
-router.delete("/admin/:userId", deleteUserByAdmin);
+router.put("/admin/:userId", uploadCloud.single("avatar"), updateUser);
+router.delete("/admin/:userId", deleteUser);
 export default router;

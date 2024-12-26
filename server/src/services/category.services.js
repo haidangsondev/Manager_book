@@ -1,7 +1,7 @@
 import categoryModel from "../models/categories.models.js";
 
-export const createCategoryBook = async ({ name, description }) => {
-  return await categoryModel.create({ name, description });
+export const createCategoryBook = async (data) => {
+  return await categoryModel.create(data);
 };
 
 export const updateCategoryBook = async (id, data) => {

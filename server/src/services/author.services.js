@@ -10,9 +10,9 @@ export const addAuthor = async (data) => {
 export const getAllAuthor = async (query) => {
   return await authorModel.find(query);
 };
-export const updateIsAuthor = async (_id, updateData) => {
-  return await authorModel.findByIdAndUpdate(_id, updateData, { new: true });
+export const updateIsAuthor = async (id, updateData) => {
+  return await authorModel.findByIdAndUpdate(id, updateData, { new: true });
 };
-export const deleteIsAuthor = async (authorId) => {
-  return await authorModel.findByIdAndDelete(authorId);
+export const deleteIsAuthor = async (id) => {
+  return await authorModel.findByIdAndDelete(id);
 };

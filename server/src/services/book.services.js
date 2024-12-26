@@ -9,9 +9,9 @@ export const getAllBooks = async (query) => {
     .populate("publisher", "name");
 };
 
-export const getBook = async (bookId) => {
+export const getBook = async (id) => {
   return await bookModel
-    .findById(bookId)
+    .findById(id)
     .populate("category", "name")
     .populate("author", "name")
     .populate("publisher", "name");
@@ -20,27 +20,27 @@ export const getBook = async (bookId) => {
 export const addBook = async (data) => {
   return await bookModel.create(data);
 };
-export const updateBook = async (bookId, data) => {
-  return await bookModel.findByIdAndUpdate(bookId, data, { new: true });
+export const updateBook = async (id, data) => {
+  return await bookModel.findByIdAndUpdate(id, data, { new: true });
 };
-export const deleteBook = async (bookId) => {
-  return await bookModel.findByIdAndDelete(bookId);
+export const deleteBook = async (id) => {
+  return await bookModel.findByIdAndDelete(id);
 };
 
 export const addReview = async (data) => {
   return await reviewModel.create(data);
 };
 
-export const deleteReview = async (reviewId) => {
-  return await reviewModel.findByIdAndDelete(reviewId);
+export const deleteReview = async (id) => {
+  return await reviewModel.findByIdAndDelete(id);
 };
 
-export const getReviewsBook = async ({}) => {
+export const getReviewsBook = async () => {
   return await reviewModel.find({});
 };
 
-export const getReviewBook = async (reviewId) => {
-  return await reviewModel.findById(reviewId);
+export const getReviewBook = async (id) => {
+  return await reviewModel.findById(id);
 };
 
 export const deleteBookReviewById = async (id) => {

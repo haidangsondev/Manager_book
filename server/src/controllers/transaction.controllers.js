@@ -21,7 +21,7 @@ export const borrowBook = asyncHandler(async (req, res) => {
   const book = await getBook(book_id);
   if (!book || book.available_copies <= 0) {
     return res
-      .status(400)
+      .status(404)
       .json({ success: false, message: "Sách không khả dụng." });
   }
 
@@ -41,7 +41,7 @@ export const borrowBook = asyncHandler(async (req, res) => {
   await addBorrowed(_id, book_id);
   await addHistoryBorrowed(_id, transaction._id);
 
-  return res.status(201).json({
+  return res.status(200).json({
     success: true,
     message: "Mượn sách thành công.",
     transaction,
@@ -52,14 +52,15 @@ export const returnBook = asyncHandler(async (req, res) => {
   const { book_id } = req.body;
   const { _id } = req.user;
 
-  const transaction = await getborrowBookUser({
+  const data = {
     user_id: _id,
     book_id,
     status: "mượn",
-  });
+  };
+  const transaction = await getborrowBookUser(data);
   if (!transaction) {
     return res
-      .status(400)
+      .status(404)
       .json({ success: false, message: "Không tìm thấy giao dịch." });
   }
 
@@ -84,7 +85,6 @@ export const returnBook = asyncHandler(async (req, res) => {
   return res.status(200).json({
     success: true,
     message: "Trả sách thành công.",
-    transaction,
   });
 });
 
@@ -92,11 +92,12 @@ export const extendBorrowing = asyncHandler(async (req, res) => {
   const { book_id } = req.body;
   const { _id } = req.user;
 
-  const transaction = await getborrowBookUser({
+  const data = {
     user_id: _id,
     book_id,
     status: "mượn",
-  });
+  };
+  const transaction = await getborrowBookUser(data);
   if (!transaction) {
     return res
       .status(400)
@@ -114,7 +115,6 @@ export const extendBorrowing = asyncHandler(async (req, res) => {
   transaction.due_date = new Date(
     transaction.due_date.setDate(transaction.due_date.getDate() + 7)
   );
-  console.log(transaction.due_date.getDate());
   await transaction.save();
 
   return res.status(200).json({
@@ -128,9 +128,11 @@ export const getBorrowHistory = asyncHandler(async (req, res) => {
   const { _id } = req.user;
 
   const history = await getHistoryBorrowBooked(_id);
-  return res.status(200).json({
-    success: true,
-    message: "Danh sách lịch sử mượn sách.",
+  return res.status(history ? 200 : 404).json({
+    success: history ? true : false,
+    message: history
+      ? "Danh sách lịch sử mượn sách."
+      : "Không tìm thấy danh sách mượn",
     data: history,
   });
 });

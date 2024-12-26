@@ -23,6 +23,6 @@ router.patch(
 router.use(verifyAccessToken, verifyIsLibrarian);
 router.get("/", getAllReservations);
 router.get("/:reservationId", getReservationDetails);
-router.delete("/:reservationId", deleteReservation);
 router.patch("/:reservationId", updateReservationStatus);
+router.delete("/:reservationId", deleteReservation);
 export default router;

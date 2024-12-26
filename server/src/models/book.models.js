@@ -1,5 +1,5 @@
 import mongoose from "mongoose";
-
+import mongoosePaginate from "mongoose-paginate-v2";
 const bookSchema = new mongoose.Schema(
   {
     title: {
@@ -75,6 +75,7 @@ const bookSchema = new mongoose.Schema(
   { timestamps: true }
 );
 
+bookSchema.plugin(mongoosePaginate);
 const Book = mongoose.model("Book", bookSchema);
 
 export default Book;

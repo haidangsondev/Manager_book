@@ -30,15 +30,21 @@ export const reserveBook = asyncHandler(async (req, res) => {
 
   const data = { user_id: _id, book_id, expiry_date };
   const reservation = await createReservation(data);
+  if (!reservation) {
+    return res.status(500).json({
+      success: false,
+      message: "Đặt sách không thành công.",
+    });
+  }
 
   book.reserved_copies += 1;
   book.available_copies -= 1;
   await book.save();
 
   await addReversationBook(_id, reservation._id);
-  return res.status(reservation ? 200 : 404).json({
-    success: reservation ? true : reservation,
-    message: reservation ? "Đặt sách trước thành công." : "Đặt sách thất bại.",
+  return res.status(200).json({
+    success: true,
+    message: "Đặt sách trước thành công.",
     reservation,
   });
 });
@@ -103,7 +109,7 @@ export const getAllReservations = asyncHandler(async (req, res) => {
     message: reservations
       ? "Danh sách yêu cầu đặt trước."
       : "Yêu cầu đặt trước không tìm thấy",
-    reservations,
+    reservations: reservations ? reservations : "",
   });
 });
 
@@ -128,7 +134,7 @@ export const deleteReservation = asyncHandler(async (req, res) => {
     success: reservation ? true : false,
     message: reservation
       ? "Xóa yêu cầu đặt trước thành công."
-      : "Yêu cầu đặt trước không tìm thấy",
+      : "Yêu cầu đặt trước không tìm thấy.",
   });
 });
 
