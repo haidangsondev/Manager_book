@@ -27,7 +27,7 @@ Dự án sử dụng mô hình Model-Controller-Services, bao gồm:
 - **Routes**: Định tuyến các API cho các chức năng quản lý thư viện.
 - **Middlewares**: Xử lí các logic về lỗi trước khi gửi lên server hoặc kết quả lỗi khi xử lí.
 
-   ![kiến trúc hệ thống](./server/src/img/image.png)
+   ![kiến trúc hệ thống](./server/src/img/server.png)
 
 ## 4. Hướng Dẫn Cài Đặt
 
@@ -43,6 +43,9 @@ Dự án sử dụng mô hình Model-Controller-Services, bao gồm:
    ```
 3. Tạo file `.env` và cấu hình các biến môi trường:
 - PORT = 7000
+- NODE_ENV = development
+- NODE_ENV = test
+- URL_MONGODB_TEST = your_url_mongodb_test
 - URL_MONGODB = your_url_mongodb
 - URL_SERVER = http://localhost:7000
 - URL_CLIENT =  http://localhost:3000
@@ -53,7 +56,7 @@ Dự án sử dụng mô hình Model-Controller-Services, bao gồm:
 - CLOUDINARY_KEY = your_cloudinary_key
 - CLOUDINARY_SECRET = your_cloudinary_secret
 
-4. Chạy dự án:
+1. Chạy dự án:
 - npm run dev
    ```bash
    "dev": "cross-env NODE_ENV=development nodemon index.js"
