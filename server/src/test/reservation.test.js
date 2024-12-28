@@ -34,7 +34,7 @@ describe("Reservation", () => {
     jest.clearAllMocks();
   });
 
-  describe("Reserver book", () => {
+  describe("POST /api/reservation", () => {
     it("Trả về 400 nếu sách không khả dụng", async () => {
       getBook.mockResolvedValue({ available_copies: 0 });
 
@@ -95,7 +95,7 @@ describe("Reservation", () => {
     });
   });
 
-  describe("Get reservations", () => {
+  describe("GET /api/reservation", () => {
     it("Trả về 404 nếu không tìm thấy danh sách đặt trước", async () => {
       getUserReservations.mockResolvedValue(null);
 
@@ -122,7 +122,7 @@ describe("Reservation", () => {
     });
   });
 
-  describe("Cancel reserver book", () => {
+  describe("PATCH /api/reservation/cancel/reservationId", () => {
     it("Trả về 404 nếu yêu cầu đặt trước không tồn tại", async () => {
       getUserReservationById.mockResolvedValue(null);
 
@@ -196,7 +196,7 @@ describe("Reservation", () => {
   //     });
   //   });
 
-  describe("Get reservation by librarian", () => {
+  describe("GET /api/reservation/reservationId", () => {
     it("Trả về 404 nếu không tìm thấy yêu cầu đặt trước", async () => {
       // Mock không tìm thấy yêu cầu đặt trước
       getUserReservationById.mockResolvedValue(null);
@@ -228,7 +228,7 @@ describe("Reservation", () => {
     });
   });
 
-  describe("Update reservation by librarian", () => {
+  describe("PATCH /api/reservation/reservationId", () => {
     it("Trả về 400 nếu trạng thái không hợp lệ", async () => {
       const response = await supertest(app)
         .patch("/api/reservation/1")
@@ -291,7 +291,7 @@ describe("Reservation", () => {
     });
   });
 
-  describe("Remove reservation by librarian", () => {
+  describe("DELETE /api/reservation/reservationId", () => {
     it("Trả về 404 nếu không tìm thấy yêu cầu đặt sách", async () => {
       // Giả sử không tìm thấy yêu cầu đặt sách
       getUserReservationById.mockResolvedValue(null);

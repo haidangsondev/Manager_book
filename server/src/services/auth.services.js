@@ -15,7 +15,7 @@ export const checkUserRefreshAccessToken = async ({
 };
 
 export const registerUser = async (data) => {
-  return await userModel.create(data).select("-password -emailToken");
+  return await userModel.create(data)
 };
 
 export const updateUser = async (id, data) => {

@@ -33,7 +33,7 @@ describe("Transaction", () => {
     jest.clearAllMocks();
   });
 
-  describe("Borrow book", () => {
+  describe("POST /api/transaction/borrow", () => {
     it("Trả về 404 nếu sách không khả dụng", async () => {
       getBook.mockResolvedValue({ id: "book1", available_copies: 0 });
 
@@ -71,7 +71,7 @@ describe("Transaction", () => {
     });
   });
 
-  describe("Return book", () => {
+  describe("POST /api/transaction/return", () => {
     it("Trả về 400 nếu không tìm thấy giao dịch", async () => {
       // Mock `getborrowBookUser` trả về null (không tìm thấy giao dịch)
       getborrowBookUser.mockResolvedValue(null);
@@ -152,7 +152,7 @@ describe("Transaction", () => {
     });
   });
 
-  describe("Extend book", () => {
+  describe("POST /api/transaction/extend", () => {
     it("Trả về 400 nếu giao dịch không tồn tại", async () => {
       getborrowBookUser.mockResolvedValue(null);
 
@@ -223,7 +223,7 @@ describe("Transaction", () => {
     });
   });
 
-  describe("History", () => {
+  describe("GET /api/transaction/history", () => {
     it("Trả về 200 và danh sách lịch sử mượn sách nếu thành công", async () => {
       const mockHistory = [
         {
@@ -262,7 +262,7 @@ describe("Transaction", () => {
     });
   });
 
-  describe("Get transactions", () => {
+  describe("GET /api/transaction", () => {
     it("Trả về 404 nếu không tìm thấy giao dịch", async () => {
       getTransactions.mockResolvedValue(null);
 
@@ -304,7 +304,7 @@ describe("Transaction", () => {
     });
   });
 
-  describe("Get transaction", () => {
+  describe("GET /api/transaction/:transactionId", () => {
     it("Trả về 404 nếu giao dịch không tồn tại", async () => {
       getTransactionById.mockResolvedValue(null);
 
@@ -338,7 +338,7 @@ describe("Transaction", () => {
     });
   });
 
-  describe("Delete transaction", () => {
+  describe("DELETE /api/transaction/:transactionId", () => {
     it("Trả về 404 nếu giao dịch không tồn tại", async () => {
       deleteTransactionById.mockResolvedValue(null);
 

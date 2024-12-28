@@ -1,5 +1,5 @@
 import express from "express";
-import { validateRequest } from "../middlewares/auth.middleware.js";
+import { validateRequest } from "../middlewares/validate.middleware.js";
 import {
   finalRegister,
   forgotPassword,
@@ -19,9 +19,9 @@ router.post("/login", validateRequest("login"), loginUser);
 router.post("/logout", verifyAccessToken, logoutUser);
 router.post(
   "/forgot-password",
-  validateRequest("forgot-password"),
+  validateRequest("forgotPassword"),
   forgotPassword
 );
-router.put("/reset-password", validateRequest("reset-password"), resetPassword);
+router.put("/reset-password", validateRequest("resetPassword"), resetPassword);
 router.post("/refresh-token", verifyAccessToken, refreshAccessToken);
 export default router;

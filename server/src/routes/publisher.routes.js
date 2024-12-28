@@ -1,5 +1,5 @@
 import express from "express";
-import { validatePublisher } from "../middlewares/publisher.middleware.js";
+import { validateRequest } from "../middlewares/validate.middleware.js";
 import { verifyAccessToken, verifyIsLibrarian } from "../utils/jwt.js";
 import {
   deletePublisher,
@@ -11,7 +11,7 @@ import {
 const router = express.Router();
 
 router.use(verifyAccessToken, verifyIsLibrarian);
-router.post("/", validatePublisher("publisher"), createPublisher);
+router.post("/", validateRequest("publisher"), createPublisher);
 router.get("/", getPublishers);
 router.put("/:publisherId", updatePublisher);
 router.delete("/:publisherId", deletePublisher);

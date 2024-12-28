@@ -1,5 +1,5 @@
 import express from "express";
-import { validateBook } from "../middlewares/book.middleware.js";
+import { validateRequest } from "../middlewares/validate.middleware.js";
 import { verifyAccessToken, verifyIsLibrarian } from "../utils/jwt.js";
 import {
   createBook,
@@ -19,16 +19,16 @@ const router = express.Router();
 router.use(verifyAccessToken);
 router.get("/", getBooks);
 router.get("/:bookId", getBookId);
-router.post("/review/:bookId", validateBook("review"), createReview);
+router.post("/review/:bookId", validateRequest("review"), createReview);
 router.delete("/review/:reviewId", removeReview);
 
 // LIBRARIAN
 router.use(verifyAccessToken, verifyIsLibrarian);
-router.post("/", validateBook("book"), createBook);
+router.post("/", validateRequest("book"), createBook);
 router.put("/:bookId", editBook);
 router.delete("/:bookId", removeBook);
-router.get("/review", getBookReviews);
 router.get("/review/:reviewId", getBookReviewById);
+router.get("/review", getBookReviews);
 router.delete("/review/:reviewId", deleteBookReview);
 
 export default router;

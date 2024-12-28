@@ -1,5 +1,5 @@
 import express from "express";
-import { validateCategory } from "../middlewares/category.middleware.js";
+import { validateRequest } from "../middlewares/validate.middleware.js";
 import { verifyAccessToken, verifyIsLibrarian } from "../utils/jwt.js";
 import {
   createCategory,
@@ -11,7 +11,7 @@ import {
 const router = express.Router();
 
 router.use(verifyAccessToken, verifyIsLibrarian);
-router.post("/", validateCategory("category"), createCategory);
+router.post("/", validateRequest("category"), createCategory);
 router.put("/:categoryId", updateCategory);
 router.get("/", getCategories);
 router.delete("/:categoryId", deleteCategory);

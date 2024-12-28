@@ -47,13 +47,13 @@ export const register = asyncHandler(async (req, res, next) => {
   return res.status(200).json({
     success: true,
     message: "Kiểm tra email để xác thực tài khoản đã đăng ký",
-    registerToken,
+    // registerToken,
   });
 });
 
 export const finalRegister = asyncHandler(async (req, res, next) => {
   const { register_token } = req.params;
-  const cookie = JSON.parse(req.cookies?.data_book_register || "{}");
+  const cookie = req.cookies?.data_book_register;
 
   // Kiểm tra mã xác thực của người dùng qua email đã đăng ký
   if (!cookie || cookie.registerToken !== register_token) {
@@ -73,7 +73,6 @@ export const finalRegister = asyncHandler(async (req, res, next) => {
     emailToken: registerToken,
     isVerify: true,
   };
-
   const response = await registerUser(data);
 
   // Xóa các thông tin đã lưu khi đã xác thực mã qua email lúc đăng ký

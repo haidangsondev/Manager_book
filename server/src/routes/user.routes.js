@@ -16,7 +16,7 @@ import {
   getUserDetailsByAdmin,
 } from "../controllers/user.controllers.js";
 import uploadCloud from "../utils/cloudinary.js";
-import { validateUser } from "../middlewares/user.middleware.js";
+import { validateRequest } from "../middlewares/validate.middleware.js";
 
 const router = express.Router();
 
@@ -25,13 +25,13 @@ router.get("/profile", getUserProfile);
 router.put("/profile", uploadCloud.single("avatar"), updateUserProfile);
 router.put(
   "/change-password",
-  validateUser("change-password"),
+  validateRequest("changePassword"),
   changeUserPassword
 );
 
 // LIBRARIAN
 router.use(verifyAccessToken, verifyIsLibrarian);
-router.post("/", validateUser("createUserLibrarian"), createUser);
+router.post("/", validateRequest("user"), createUser);
 router.get("/", getUsers);
 router.put("/:userId", uploadCloud.single("avatar"), updateUser);
 router.delete("/:userId", deleteUser);

@@ -26,7 +26,7 @@ jest.mock("../../src/services/publisher.services.js"); // Mock các service
 
 beforeAll(async () => {
   await connectTest();
-}, 5000);
+});
 
 afterAll(async () => {
   await closeConnectTest();
@@ -37,10 +37,10 @@ describe("Book", () => {
   beforeEach(() => {
     jest.clearAllMocks();
   });
-  describe("Get Books", () => {
+  describe("GET /api/book", () => {
     it("Trả về 404 nếu không tìm thấy sách", async () => {
-      // Mock `getAllBooks` trả về null
-      getAllBooks.mockResolvedValue(null);
+      // Mock `getAllBooks` trả về []
+      getAllBooks.mockResolvedValue([]);
 
       const response = await supertest(app)
         .get("/api/book")
@@ -51,7 +51,7 @@ describe("Book", () => {
       expect(response.body.message).toBe("Không tìm thấy sách");
     });
 
-    it("Trả về danh sách sách khi tìm kiếm thành công", async () => {
+    it("Trả về 200 nếu danh sách sách khi tìm kiếm thành công", async () => {
       // Mock dữ liệu sách giả lập
       const mockBooks = [
         { title: "Book 1", author: "Author 1" },
@@ -68,10 +68,10 @@ describe("Book", () => {
       expect(response.status).toBe(200);
       expect(response.body.success).toBe(true);
       expect(response.body.message).toBe("Danh sách sách");
-      expect(response.body.books).toEqual(mockBooks);
+      expect(response.body.data).toEqual(mockBooks);
     });
 
-    it("Trả về danh sách sách khi không có từ khóa tìm kiếm", async () => {
+    it("Trả về 200 khi danh sách sách  không có từ khóa tìm kiếm", async () => {
       // Mock dữ liệu sách giả lập
       const mockBooks = [
         { title: "Book 1", author: "Author 1" },
@@ -86,11 +86,11 @@ describe("Book", () => {
       expect(response.status).toBe(200);
       expect(response.body.success).toBe(true);
       expect(response.body.message).toBe("Danh sách sách");
-      expect(response.body.books).toEqual(mockBooks);
+      expect(response.body.data).toEqual(mockBooks);
     });
   });
 
-  describe("Get book", () => {
+  describe("GET /api/book/:bookId", () => {
     it("Trả về 200 và thông tin sách nếu tìm thấy sách", async () => {
       const mockBook = {
         _id: "12345",
@@ -106,7 +106,7 @@ describe("Book", () => {
       expect(response.status).toBe(200);
       expect(response.body.success).toBe(true);
       expect(response.body.message).toBe("Chi tiết sách");
-      expect(response.body.book).toEqual(mockBook);
+      expect(response.body.data).toEqual(mockBook);
     });
     it("Trả về 404 nếu không tìm thấy sách", async () => {
       // Mock `getBook` trả về null
@@ -117,11 +117,10 @@ describe("Book", () => {
       expect(response.status).toBe(404);
       expect(response.body.success).toBe(false);
       expect(response.body.message).toBe("Không tìm thấy sách");
-      expect(response.body.book).toBe("");
     });
   });
 
-  describe("Create review", () => {
+  describe("POST /api/book/review/:bookId", () => {
     it("Trả về 201 và thông báo thành công nếu đánh giá được tạo", async () => {
       const mockReview = {
         book_id: "book123",
@@ -158,12 +157,14 @@ describe("Book", () => {
 
       expect(response.status).toBe(500);
       expect(response.body.success).toBe(false);
-      expect(response.body.message).toBe("Đánh giá không thành công");
+      expect(response.body.message).toBe(
+        "Có xảy rã lỗi hệ thống khi đánh giá sách"
+      );
     });
   });
 
-  describe("Remove review", () => {
-    it("Trả về 500 nếu người dùng không có quyền xóa đánh giá", async () => {
+  describe("DELETE /api/book/reivew/:bookId", () => {
+    it("Trả về 404 nếu người dùng không có quyền xóa đánh giá do không tồn tại", async () => {
       // Mock `getProfile` trả về null (người dùng không tồn tại hoặc không có quyền)
       getProfile.mockResolvedValue(null);
 
@@ -171,7 +172,7 @@ describe("Book", () => {
         "/api/book/review/review123"
       );
 
-      expect(response.status).toBe(500);
+      expect(response.status).toBe(404);
       expect(response.body.success).toBe(false);
       expect(response.body.message).toBe("Bạn không có quyèn xóa");
     });
@@ -191,9 +192,26 @@ describe("Book", () => {
       expect(response.body.success).toBe(true);
       expect(response.body.message).toBe("Xóa đánh giá thành công");
     });
+    it("Trả về 500 khi có lỗi hệ thống xảy ra", async () => {
+      // Mock `getProfile` trả về user hợp lệ
+      getProfile.mockResolvedValue({ user_id: "user123" });
+
+      // Mock `deleteReview` trả về true (đánh giá được xóa)
+      deleteReview.mockResolvedValue(false);
+
+      const response = await supertest(app).delete(
+        "/api/book/review/review123"
+      );
+
+      expect(response.status).toBe(500);
+      expect(response.body.success).toBe(false);
+      expect(response.body.message).toBe(
+        "Có xảy rã lỗi hệ thống khi xóa đánh giá sách"
+      );
+    });
   });
 
-  describe("Create book by librarian", () => {
+  describe("POST /api/book ", () => {
     it("Trả về 404 nếu thể loại sách không tồn tại", async () => {
       getCategoryBookId.mockResolvedValue(null);
       const response = await supertest(app).post("/api/book").send({
@@ -279,11 +297,11 @@ describe("Book", () => {
       expect(response.status).toBe(201);
       expect(response.body.success).toBe(true);
       expect(response.body.message).toBe("Sách đã được thêm thành công");
-      expect(response.body.book).toEqual(mockBook);
+      expect(response.body.data).toEqual(mockBook);
     });
   });
 
-  describe("Edit book by librarian", () => {
+  describe("PUT /api/book", () => {
     it("Trả về 400 nếu không cung cấp thông tin cập nhật", async () => {
       const response = await supertest(app)
         .put("/api/book/validBookId")
@@ -328,7 +346,7 @@ describe("Book", () => {
     });
   });
 
-  describe("Remove book by librarian", () => {
+  describe("DELETE /api/book/:bookId", () => {
     it("Trả về 404 nếu sách không tồn tại", async () => {
       // Mock `deleteBook` trả về null
       deleteBook.mockResolvedValue(null);
@@ -356,10 +374,10 @@ describe("Book", () => {
     });
   });
 
-  describe("Get reviews by librarian", () => {
+  describe("GET /api/book/review", () => {
     it("Trả về 404 nếu không tìm thấy đánh giá", async () => {
-      // Mock `getReviewsBook` trả về null
-      getReviewsBook.mockResolvedValue(null);
+      // Mock `getReviewsBook` trả về []
+      getReviewsBook.mockResolvedValue([]);
 
       const response = await supertest(app).get("/api/book/review");
 
@@ -368,7 +386,7 @@ describe("Book", () => {
       expect(response.body.message).toBe("Không tìm thấy sách");
     });
 
-    // it("Trả về 201 nếu lấy danh sách đánh giá thành công", async () => {
+    // it("Trả về 200 nếu lấy danh sách đánh giá thành công", async () => {
     //   // Mock `getReviewsBook` trả về danh sách đánh giá
     //   const reviewsMock = [
     //     {
@@ -379,18 +397,19 @@ describe("Book", () => {
     //     },
     //     { user_id: "user2", book_id: "book1", rating: 4, comment: "Rất tốt!" },
     //   ];
-    //   getReviewsBook.mockResolvedValue(reviewsMock);
+    //   getReviewsBook.mockResolvedValue(true);
 
-    //   const response = await supertest(app).get("/api/book/reviews");
+    //   const response = await supertest(app).get("/api/book/review");
+    //   console.log(response);
 
-    //   expect(response.status).toBe(201);
+    //   expect(response.status).toBe(200);
     //   expect(response.body.success).toBe(true);
     //   expect(response.body.message).toBe("Danh sách đánh giá");
-    //   expect(response.body.reviews).toEqual(reviewsMock);
+    //   expect(response.body.data).toEqual(reviewsMock);
     // });
   });
 
-  describe("Get review by librarian", () => {
+  describe("GET /api/book/review/:reviewId", () => {
     it("Trả về 404 nếu không tìm thấy đánh giá", async () => {
       // Mock `getReviewBook` trả về null
       getReviewBook.mockResolvedValue(null);
@@ -401,7 +420,7 @@ describe("Book", () => {
       expect(response.body.success).toBe(false);
       expect(response.body.message).toBe("Không tìm thấy đánh giá");
     });
-    it("Trả về 201 nếu tìm thấy đánh giá", async () => {
+    it("Trả về 200 nếu tìm thấy đánh giá", async () => {
       // Mock `getReviewBook` trả về chi tiết đánh giá
       const reviewMock = {
         user_id: "user1",
@@ -412,34 +431,33 @@ describe("Book", () => {
       getReviewBook.mockResolvedValue(reviewMock);
 
       const response = await supertest(app).get("/api/book/review/validId");
-
-      expect(response.status).toBe(201);
+      expect(response.status).toBe(200);
       expect(response.body.success).toBe(true);
       expect(response.body.message).toBe("Chi tiết đánh giá");
-      expect(response.body.review).toEqual(reviewMock);
+      expect(response.body.data).toEqual(reviewMock);
     });
   });
 
-  describe("Remove review by librarian", () => {
-    // it("Trả về 404 nếu không tìm thấy đánh giá để xóa", async () => {
-    //   // Mock `deleteBookReviewById` trả về null
-    //   deleteBookReviewById.mockResolvedValue(false);
+  describe("DELETE /api/book/review/:reviewId", () => {
+    it("Trả về 404 nếu không tìm thấy đánh giá để xóa", async () => {
+      // Mock `deleteBookReviewById` trả về null
+      deleteBookReviewById.mockResolvedValue(null);
 
-    //   const response = await supertest(app).delete(
-    //     "/api/book/review/invalidId"
-    //   );
+      const response = await supertest(app).delete(
+        "/api/book/review/invalidId"
+      );
 
-    //   expect(response.status).toBe(404);
-    //   expect(response.body.success).toBe(false);
-    //   expect(response.body.message).toBe("Không tìm thấy đánh giá");
-    // });
-    it("Trả về 201 nếu xóa đánh giá thành công", async () => {
+      expect(response.status).toBe(404);
+      expect(response.body.success).toBe(false);
+      expect(response.body.message).toBe("Không tìm thấy đánh giá");
+    });
+    it("Trả về 200 nếu xóa đánh giá thành công", async () => {
       // Mock `deleteBookReviewById` trả về true
       deleteBookReviewById.mockResolvedValue(true);
 
       const response = await supertest(app).delete("/api/book/review/validId");
 
-      expect(response.status).toBe(201);
+      expect(response.status).toBe(200);
       expect(response.body.success).toBe(true);
       expect(response.body.message).toBe("Xóa đánh giá thành công");
     });

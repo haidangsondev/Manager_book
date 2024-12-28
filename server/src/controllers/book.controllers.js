@@ -69,7 +69,7 @@ export const removeReview = asyncHandler(async (req, res) => {
 
   const user = await getProfile(_id);
   if (!user) {
-    return res.status(500).json({
+    return res.status(404).json({
       success: false,
       message: "Bạn không có quyèn xóa",
     });
@@ -80,7 +80,7 @@ export const removeReview = asyncHandler(async (req, res) => {
     success: review ? true : false,
     message: review
       ? "Xóa đánh giá thành công"
-      : "Xóa đánh giá không thành công",
+      : "Có xảy rã lỗi hệ thống khi xóa đánh giá sách",
   });
 });
 
@@ -117,7 +117,7 @@ export const createBook = asyncHandler(async (req, res) => {
   res.status(201).json({
     success: true,
     message: "Sách đã được thêm thành công",
-    book: newBook,
+    data: newBook,
   });
 });
 
@@ -151,20 +151,20 @@ export const removeBook = asyncHandler(async (req, res) => {
 export const getBookReviews = asyncHandler(async (req, res) => {
   const reviews = await getReviewsBook();
   console.log(reviews);
-  return res.status(reviews ? 201 : 404).json({
+  return res.status(reviews ? 200 : 404).json({
     success: reviews ? true : false,
     message: reviews ? "Danh sách đánh giá" : "Không tìm thấy đánh giá",
-    reviews: reviews ? reviews : "",
+    data: reviews,
   });
 });
 
 export const getBookReviewById = asyncHandler(async (req, res) => {
   const { reviewId } = req.params;
   const review = await getReviewBook(reviewId);
-  return res.status(review ? 201 : 404).json({
+  return res.status(review ? 200 : 404).json({
     success: review ? true : false,
     message: review ? "Chi tiết đánh giá" : "Không tìm thấy đánh giá",
-    review: review ? review : "",
+    data: review,
   });
 });
 
@@ -172,7 +172,7 @@ export const deleteBookReview = asyncHandler(async (req, res) => {
   const { reviewId } = req.params;
 
   const review = await deleteBookReviewById(reviewId);
-  return res.status(review ? 201 : 404).json({
+  return res.status(review ? 200 : 404).json({
     success: review ? true : false,
     message: review ? "Xóa đánh giá thành công" : "Không tìm thấy đánh giá",
   });
