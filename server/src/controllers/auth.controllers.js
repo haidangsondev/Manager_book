@@ -43,18 +43,18 @@ export const register = asyncHandler(async (req, res, next) => {
 
   // Gửi email để xác thực người dùng
   await sendEmail(data);
+  const cookie = req.cookies?.data_book_register;
 
   return res.status(200).json({
     success: true,
     message: "Kiểm tra email để xác thực tài khoản đã đăng ký",
-    // registerToken,
   });
 });
 
 export const finalRegister = asyncHandler(async (req, res, next) => {
   const { register_token } = req.params;
   const cookie = req.cookies?.data_book_register;
-
+  console.log({ cookie, register_token });
   // Kiểm tra mã xác thực của người dùng qua email đã đăng ký
   if (!cookie || cookie.registerToken !== register_token) {
     res.clearCookie("data_book_register");
@@ -173,7 +173,6 @@ export const forgotPassword = asyncHandler(async (req, res) => {
   return res.status(200).json({
     success: true,
     message: "Kiểm tra email để xác thực cho việc cho quá trình đổi mật khẩu",
-    passwordResetToken,
   });
 });
 
