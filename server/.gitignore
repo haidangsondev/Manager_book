@@ -1,6 +1,9 @@
 # Node modules
 node_modules/
 
+# build project 
+build/
+
 
 # Environment variables
 .env
